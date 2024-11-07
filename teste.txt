@@ -1,0 +1,4 @@
+int a = 512;
+int b = 53;
+
+int soma = a + b;
