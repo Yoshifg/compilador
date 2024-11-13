@@ -54,7 +54,11 @@ void printTokenArray(const TokenArray *arr) {
                 printf("EOF\n");
                 break;
             case TOKEN_NUMBER:
-                printf("Number: %lld\n", token.int_value);
+                if(token.float_value != 0.0) {
+                    printf("Number: %Lf\n", token.float_value);
+                } else {
+                    printf("Number: %lld\n", token.int_value);
+                }
                 break;
             case TOKEN_IDENTIFIER:
                 printf("Identifier: %s\n", token.str_value);

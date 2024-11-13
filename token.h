@@ -51,7 +51,7 @@ typedef enum
     TOKEN_LBRACKET,          // Colchete esquerdo [
     TOKEN_RBRACKET,          // Colchete direito ]
     TOKEN_SEMICOLON,         // Ponto e vírgula ; DELIMITADOR
-    TOKEN_COMMA              // Vírgula ,
+    TOKEN_COMMA,            // Vírgula ,
 } TokenType;
 
 typedef struct

@@ -37,13 +37,21 @@ char *strndup(const char *src, size_t n) {
 // Lê um número da entrada e cria um token de número
 Token read_number(Lexer *lexer) {
     const char *start = &lexer->source[lexer->position];
-    while (lexer->position < lexer->length && isdigit(lexer->source[lexer->position])) {
+    int is_float = 0;
+    while (lexer->position < lexer->length && (isdigit(lexer->source[lexer->position]) || lexer->source[lexer->position] == '.')) {
+        if (lexer->source[lexer->position] == '.') {
+            is_float = 1;
+        }
         lexer->position++;
     }
     size_t length = lexer->position - (start - lexer->source);
     char *number_str = strndup(start, length);
     Token token = make_token(lexer, TOKEN_NUMBER);
-    token.int_value = atoll(number_str);
+    if (is_float) {
+        token.float_value = atof(number_str);
+    } else {
+        token.int_value = atoll(number_str);
+    }
     free(number_str);
     return token;
 }
@@ -107,80 +115,92 @@ Token read_operators_delimiters(Lexer *lexer) {
 
     switch (current_char) {
         case '+':
-            token.type = TOKEN_PLUS;
+            token = make_token(lexer, TOKEN_PLUS);
             break;
         case '-':
-            token.type = TOKEN_MINUS;
+            token = make_token(lexer, TOKEN_MINUS);
             break;
         case '*':
-            token.type = TOKEN_MULT;
+            token = make_token(lexer, TOKEN_MULT);
             break;
         case '/':
-            token.type = TOKEN_DIV;
+            token = make_token(lexer, TOKEN_DIV);
             break;
         case '!':
             if (lexer->source[lexer->position + 1] == '=') {
-                token.type = TOKEN_NEQ;
+                token = make_token(lexer, TOKEN_NEQ);
                 lexer->position++;
             } else {
-                token.type = TOKEN_NOT;
+                token = make_token(lexer, TOKEN_NOT);
             }
             break;
         case '=':
             if (lexer->source[lexer->position + 1] == '=') {
-                token.type = TOKEN_EQ;
+                token = make_token(lexer, TOKEN_EQ);
                 lexer->position++;
             } else {
-                token.type = TOKEN_ASSIGN;
+                token = make_token(lexer, TOKEN_ASSIGN);
             }
             break;
         case '<':
             if (lexer->source[lexer->position + 1] == '=') {
-                token.type = TOKEN_LTE;
+                token = make_token(lexer, TOKEN_LTE);
                 lexer->position++;
             } else {
-                token.type = TOKEN_LT;
+                token = make_token(lexer, TOKEN_LT);
             }
             break;
         case '>':
             if (lexer->source[lexer->position + 1] == '=') {
-                token.type = TOKEN_GTE;
+                token = make_token(lexer, TOKEN_GTE);
                 lexer->position++;
             } else {
-                token.type = TOKEN_GT;
+                token = make_token(lexer, TOKEN_GT);
             }
             break;
         case '(':
-            token.type = TOKEN_LPAREN;
+            token = make_token(lexer, TOKEN_LPAREN);
             break;
         case ')':
-            token.type = TOKEN_RPAREN;
+            token = make_token(lexer, TOKEN_RPAREN);
             break;
         case '{':
-            token.type = TOKEN_LBRACE;
+            token = make_token(lexer, TOKEN_LBRACE);
             break;
         case '}':
-            token.type = TOKEN_RBRACE;
+            token = make_token(lexer, TOKEN_RBRACE);
             break;
         case '[':
-            token.type = TOKEN_LBRACKET;
+            token = make_token(lexer, TOKEN_LBRACKET);
             break;
         case ']':
-            token.type = TOKEN_RBRACKET;
+            token = make_token(lexer, TOKEN_RBRACKET);
             break;
         case ';':
-            token.type = TOKEN_SEMICOLON;
+            token = make_token(lexer, TOKEN_SEMICOLON);
             break;
         case ',':
-            token.type = TOKEN_COMMA;
+            token = make_token(lexer, TOKEN_COMMA);
             break;
         default:
-            token.type = TOKEN_EOF;
+            token = make_token(lexer, TOKEN_EOF);
             break;
     }
 
     lexer->position++;
     return token;
+}
+
+// Ignora comentários na entrada
+void skip_comment(Lexer *lexer) {
+    while (lexer->position < lexer->length && lexer->source[lexer->position] != '\n') {
+        lexer->position++;
+    }
+    // Pula o caractere de nova linha também
+    if (lexer->position < lexer->length && lexer->source[lexer->position] == '\n') {
+        lexer->position++;
+    }
+    lexer->line++;
 }
 
 // Tokeniza a entrada e armazena os tokens no array de tokens
@@ -191,7 +211,15 @@ void tokenize(Lexer *lexer, TokenArray *token_array) {
         char current_char = lexer->source[lexer->position];
 
         if (isspace(current_char)) {
+            if (current_char == '\n') {
+                lexer->line++;
+            }
             lexer->position++;
+            continue;
+        }
+
+        if (current_char == '#') {
+            skip_comment(lexer);
             continue;
         }
 
