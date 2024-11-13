@@ -48,7 +48,7 @@ void free_token_array(TokenArray *arr) {
 void printTokenArray(const TokenArray *arr) {
     for (size_t i = 0; i < arr->size; i++) {
         Token token = arr->tokens[i];
-        printf("Token %lld: ", i);
+        printf("Token %ld: ", i);
         switch (token.type) {
             case TOKEN_EOF:
                 printf("EOF\n");

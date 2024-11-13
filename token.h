@@ -17,7 +17,7 @@ typedef enum
     TOKEN_CHAR_LITERAL,      // Literal de caractere
     TOKEN_STRING_LITERAL,    // Literal de string
 
-    // Palavras-chave
+    // Palavras-chave (Keyword)
     TOKEN_INT,               // Palavra-chave inteiro
     TOKEN_FLOAT,             // Palavra-chave float
     TOKEN_CHAR,              // Palavra-chave char
@@ -43,14 +43,14 @@ typedef enum
     TOKEN_LTE,               // Operador menor ou igual <= 
     TOKEN_GTE,               // Operador maior ou igual >=
 
-    // Delimitadores
+    // Outros simbolos
     TOKEN_LPAREN,            // Parêntese esquerdo (
     TOKEN_RPAREN,            // Parêntese direito )
     TOKEN_LBRACE,            // Chave esquerda {
     TOKEN_RBRACE,            // Chave direita }
     TOKEN_LBRACKET,          // Colchete esquerdo [
     TOKEN_RBRACKET,          // Colchete direito ]
-    TOKEN_SEMICOLON,         // Ponto e vírgula ;
+    TOKEN_SEMICOLON,         // Ponto e vírgula ; DELIMITADOR
     TOKEN_COMMA              // Vírgula ,
 } TokenType;
 
