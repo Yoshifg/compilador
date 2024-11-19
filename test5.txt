@@ -1,0 +1,9 @@
+# Testando comentários e várias linhas
+int x = 42; # Comentário na mesma linha
+float y = 3.14159;
+# Comentário em uma linha inteira
+if (x > y) {
+    x = x - 1;
+} else {
+    y = y + 1;
+}

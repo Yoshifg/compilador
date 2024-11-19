@@ -11,7 +11,8 @@ typedef enum
     TOKEN_EOF,
 
     // Literais
-    TOKEN_NUMBER,            // Token numérico
+    TOKEN_NUMBER_INT,            // Token numérico
+    TOKEN_NUMBER_FLOAT,          // Token numérico
     TOKEN_IDENTIFIER,        // Token identificador
     TOKEN_STRING,            // Token string
     TOKEN_CHAR_LITERAL,      // Literal de caractere

@@ -1,0 +1,7 @@
+# Testando variáveis em snake case e números
+int snake_case_var = 100;
+float float_var = 0.001;
+char char_var = 'c';
+while (snake_case_var > 0) {
+    snake_case_var = snake_case_var - 1;
+}

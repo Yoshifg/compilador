@@ -1,0 +1,7 @@
+# Testando operadores e delimitadores
+int a = 5;
+int b = 10;
+int result = a + b * (a - b) / 2;
+if (result != 0) {
+    result = result % 2;
+}

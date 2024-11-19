@@ -36,6 +36,7 @@ char *strndup(const char *src, size_t n) {
 
 // Lê um número da entrada e cria um token de número
 Token read_number(Lexer *lexer) {
+    Token token;
     const char *start = &lexer->source[lexer->position];
     int is_float = 0;
     while (lexer->position < lexer->length && (isdigit(lexer->source[lexer->position]) || lexer->source[lexer->position] == '.')) {
@@ -46,10 +47,12 @@ Token read_number(Lexer *lexer) {
     }
     size_t length = lexer->position - (start - lexer->source);
     char *number_str = strndup(start, length);
-    Token token = make_token(lexer, TOKEN_NUMBER);
+
     if (is_float) {
+        token = make_token(lexer, TOKEN_NUMBER_FLOAT);
         token.float_value = atof(number_str);
     } else {
+        token = make_token(lexer, TOKEN_NUMBER_INT);
         token.int_value = atoll(number_str);
     }
     free(number_str);
@@ -105,6 +108,18 @@ Token read_string_literal(Lexer *lexer) {
     Token token = make_token(lexer, TOKEN_STRING_LITERAL);
     token.str_value = string_str;
     lexer->position++; // Pula a aspa final
+    return token;
+}
+
+// Lê um caractere literal da entrada e cria um token de caractere
+Token read_char_literal(Lexer *lexer) {
+    lexer->position++; // Pula a aspa simples inicial
+    char char_value = lexer->source[lexer->position];
+    lexer->position++; // Pula o caractere
+    lexer->position++; // Pula a aspa simples final
+    Token token = make_token(lexer, TOKEN_CHAR_LITERAL);
+    char *string_str = strndup(&char_value, 1);
+    token.str_value = string_str;
     return token;
 }
 
@@ -230,6 +245,8 @@ void tokenize(Lexer *lexer, TokenArray *token_array) {
             token = read_identifier_or_keyword(lexer);
         } else if (current_char == '"') {
             token = read_string_literal(lexer);
+        } else if (current_char == '\'') {
+            token = read_char_literal(lexer);
         } else {
             token = read_operators_delimiters(lexer);
         }

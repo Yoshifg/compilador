@@ -1,0 +1,8 @@
+# Este é um comentário
+int my_variable = 10;
+float another_variable = 3.14;
+char character = 'a';
+if (my_variable > 5) {
+    my_variable = my_variable + 1;
+}
+

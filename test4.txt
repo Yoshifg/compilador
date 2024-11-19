@@ -1,0 +1,8 @@
+# Testando palavras-chave e strings
+function my_function() {
+    return "Hello, World!";
+}
+int main() {
+    char *message = my_function();
+    return 0;
+}
