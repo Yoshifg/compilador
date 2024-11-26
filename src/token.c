@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "token.h"
 
-void initTokenArray(TokenArray *arr) {
+void init_token_array(TokenArray *arr) {
     arr->size = 0;
     arr->capacity = 10;
     arr->tokens = (Token *)malloc(arr->capacity * sizeof(Token));
@@ -13,7 +14,7 @@ void initTokenArray(TokenArray *arr) {
     }
 }
 
-void addToken(TokenArray *arr, Token token) {
+void add_token(TokenArray *arr, Token token) {
     if (arr->size >= arr->capacity) {
         arr->capacity *= 2;
         Token *new_tokens = (Token *)realloc(arr->tokens, arr->capacity * sizeof(Token));
@@ -45,7 +46,7 @@ void free_token_array(TokenArray *arr) {
     arr->capacity = 0;
 }
 
-void printTokenArray(const TokenArray *arr) {
+void print_token_array(const TokenArray *arr) {
     for (size_t i = 0; i < arr->size; i++) {
         Token token = arr->tokens[i];
         printf("Token %ld: ", i);

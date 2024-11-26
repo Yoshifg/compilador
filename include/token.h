@@ -1,9 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <stdlib.h>
 #include <stddef.h>
-
 
 typedef enum
 {
@@ -70,9 +68,9 @@ typedef struct {
     size_t capacity;  // Capacidade máxima antes de precisar redimensionar
 } TokenArray;
 
-void initTokenArray(TokenArray *arr);
-void addToken(TokenArray *arr, Token token);
+void init_token_array(TokenArray *arr);
+void add_token(TokenArray *arr, Token token);
 void free_token_array(TokenArray *arr) ;
-void printTokenArray(const TokenArray *arr);
+void print_token_array(const TokenArray *arr);
 
 #endif // TOKEN_H

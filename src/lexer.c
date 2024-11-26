@@ -1,9 +1,9 @@
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "lexer.h"
 #include "token.h"
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 // Inicializa o lexer com a fonte de entrada
 void lexer_init(Lexer *lexer, const char *source) {
@@ -220,7 +220,7 @@ void skip_comment(Lexer *lexer) {
 
 // Tokeniza a entrada e armazena os tokens no array de tokens
 void tokenize(Lexer *lexer, TokenArray *token_array) {
-    initTokenArray(token_array);
+    init_token_array(token_array);
 
     while (lexer->position < lexer->length) {
         char current_char = lexer->source[lexer->position];
@@ -251,10 +251,10 @@ void tokenize(Lexer *lexer, TokenArray *token_array) {
             token = read_operators_delimiters(lexer);
         }
 
-        addToken(token_array, token);
+        add_token(token_array, token);
     }
 
     // Adiciona um token EOF no final
     Token eof_token = make_token(lexer, TOKEN_EOF);
-    addToken(token_array, eof_token);
+    add_token(token_array, eof_token);
 }
