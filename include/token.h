@@ -62,7 +62,7 @@ typedef struct {
     long long int int_value;
     long double float_value;
     char *str_value;  // Identificadores ou strings literais ou nome_vetor
-    char *vector_size; // Tamanho do vetor
+    long int vector_size; // Tamanho do vetor
 } Token;
 
 typedef struct {
@@ -73,7 +73,7 @@ typedef struct {
 
 void init_token_array(TokenArray *arr);
 void add_token(TokenArray *arr, Token token);
-void free_token_array(TokenArray *arr) ;
+void free_token_array(TokenArray *arr);
 void print_token_array(const TokenArray *arr);
 
 #endif // TOKEN_H
