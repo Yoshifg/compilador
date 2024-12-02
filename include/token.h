@@ -61,8 +61,8 @@ typedef struct {
     size_t linha;
     long long int int_value;
     long double float_value;
-    char *str_value;  // Identificadores ou strings literais.
-    char *vector_size;
+    char *str_value;  // Identificadores ou strings literais ou nome_vetor
+    char *vector_size; // Tamanho do vetor
 } Token;
 
 typedef struct {
