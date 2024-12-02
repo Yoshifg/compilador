@@ -91,7 +91,12 @@ Token read_identifier_or_keyword(Lexer *lexer) {
         token.type = TOKEN_BREAK;
     } else if (strcmp(token.str_value, "function") == 0) {
         token.type = TOKEN_FUNCTION;
+    } else if (strcmp(token.str_value, "print") == 0) {
+        token.type = TOKEN_PRINT;
+    } else if (strcmp(token.str_value, "scan") == 0) {
+        token.type = TOKEN_SCAN;
     }
+
 
     return token;
 }

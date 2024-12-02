@@ -27,6 +27,8 @@ typedef enum
     TOKEN_RETURN,            // Palavra-chave return
     TOKEN_BREAK,             // Palavra-chave break
     TOKEN_FUNCTION,          // Palavra-chave function
+    TOKEN_PRINT,             // Palavra-chave print
+    TOKEN_SCAN,              // Palavra-chave read
 
     // Operadores
     TOKEN_PLUS,              // Operador de adição + 

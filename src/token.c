@@ -102,6 +102,12 @@ void print_token_array(const TokenArray *arr) {
             case TOKEN_FUNCTION:
                 printf("Keyword: function\n");
                 break;
+            case TOKEN_PRINT:
+                printf("Keyword: print\n");
+                break;
+            case TOKEN_SCAN:
+                printf("Keyword: read\n");
+                break;
             case TOKEN_PLUS:
                 printf("Operator: +\n");
                 break;
