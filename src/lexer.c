@@ -21,6 +21,7 @@ Token make_token(Lexer *lexer, TokenType type) {
     token.int_value = 0;
     token.float_value = 0.0;
     token.str_value = NULL;
+    token.vector_size = 0;
     return token;
 }
 
@@ -95,6 +96,9 @@ Token read_identifier_or_keyword(Lexer *lexer) {
         token.type = TOKEN_PRINT;
     } else if (strcmp(token.str_value, "scan") == 0) {
         token.type = TOKEN_SCAN;
+    } else if (strcmp(token.str_value, "vector") == 0) {
+        token.type = TOKEN_VECTOR;
+
     }
 
 

@@ -29,6 +29,7 @@ typedef enum
     TOKEN_FUNCTION,          // Palavra-chave function
     TOKEN_PRINT,             // Palavra-chave print
     TOKEN_SCAN,              // Palavra-chave read
+    TOKEN_VECTOR,
 
     // Operadores
     TOKEN_PLUS,              // Operador de adição + 
@@ -55,13 +56,13 @@ typedef enum
     TOKEN_COMMA,            // Vírgula ,
 } TokenType;
 
-typedef struct
-{
+typedef struct {
     TokenType type;
     size_t linha;
-    long long int int_value; // valor numérico
+    long long int int_value;
     long double float_value;
-    char *str_value;         // para strings literais e identificadores
+    char *str_value;  // Identificadores ou strings literais.
+    char *vector_size;
 } Token;
 
 typedef struct {

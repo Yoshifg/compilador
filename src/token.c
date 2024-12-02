@@ -108,6 +108,9 @@ void print_token_array(const TokenArray *arr) {
             case TOKEN_SCAN:
                 printf("Keyword: read\n");
                 break;
+            case TOKEN_VECTOR:
+                printf("Keyword: vector\n");
+                break;
             case TOKEN_PLUS:
                 printf("Operator: +\n");
                 break;
