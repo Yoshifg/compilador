@@ -7,21 +7,21 @@ INCLUDE_DIR = include
 TEST_DIR = tests/lexer_tests
 
 # Arquivos fonte e objetos
-SRCS = $(SRC_DIR)/file_utils.c $(SRC_DIR)/lexer.c $(SRC_DIR)/token.c
+SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(SRCS:.c=.o)
 
 # Nome do alvo final
 TARGET = main
 
 # Arquivos de teste
-TESTS = $(TEST_DIR)/test1.txt $(TEST_DIR)/test2.txt $(TEST_DIR)/test3.txt $(TEST_DIR)/test4.txt $(TEST_DIR)/test5.txt
+TESTS = $(wildcard $(TEST_DIR)/*.txt)
 
 # Alvo principal
 all: $(TARGET)
 
 # Regra para gerar o executável 'main' a partir dos arquivos objeto 'main.o' e outros objetos definidos em '$(OBJS)'
 $(TARGET): src/main.o $(OBJS)
-	$(CC) -o $(TARGET) src/main.o $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS)
 
 # Regra para compilar 'main.c' em 'main.o', gerando o arquivo objeto necessário para o executável
 src/main.o: src/main.c
