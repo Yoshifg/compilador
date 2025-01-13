@@ -1,33 +1,40 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "lexer.h"
 #include "token.h"
 
 // Inicializa o lexer com a fonte de entrada
-void lexer_init(Lexer *lexer, const char *source) {
+void lexer_init(Lexer *lexer, const char *source)
+{
     lexer->source = source;
     lexer->length = strlen(source);
     lexer->position = 0;
     lexer->line = 1;
 }
 
+
 // Cria um token com o tipo especificado
-Token make_token(Lexer *lexer, TokenType type) {
+Token make_token(Lexer *lexer, TokenType type)
+{
     Token token;
     token.type = type;
     token.linha = lexer->line;
     token.int_value = 0;
     token.float_value = 0.0;
     token.str_value = NULL;
+    token.vector_size = 0;
     return token;
 }
 
 // Duplica uma string com um tamanho específico
-char *strndup(const char *src, size_t n) {
+char *strndup(const char *src, size_t n)
+{
     char *dest = (char *)malloc(n + 1);
-    if (dest) {
+    if (dest)
+    {
         strncpy(dest, src, n);
         dest[n] = '\0';
     }
@@ -35,12 +42,15 @@ char *strndup(const char *src, size_t n) {
 }
 
 // Lê um número da entrada e cria um token de número
-Token read_number(Lexer *lexer) {
+Token read_number(Lexer *lexer)
+{
     Token token;
     const char *start = &lexer->source[lexer->position];
     int is_float = 0;
-    while (lexer->position < lexer->length && (isdigit(lexer->source[lexer->position]) || lexer->source[lexer->position] == '.')) {
-        if (lexer->source[lexer->position] == '.') {
+    while (lexer->position < lexer->length && (isdigit(lexer->source[lexer->position]) || lexer->source[lexer->position] == '.'))
+    {
+        if (lexer->source[lexer->position] == '.')
+        {
             is_float = 1;
         }
         lexer->position++;
@@ -48,10 +58,13 @@ Token read_number(Lexer *lexer) {
     size_t length = lexer->position - (start - lexer->source);
     char *number_str = strndup(start, length);
 
-    if (is_float) {
+    if (is_float)
+    {
         token = make_token(lexer, TOKEN_NUMBER_FLOAT);
         token.float_value = atof(number_str);
-    } else {
+    }
+    else
+    {
         token = make_token(lexer, TOKEN_NUMBER_INT);
         token.int_value = atoll(number_str);
     }
@@ -59,11 +72,75 @@ Token read_number(Lexer *lexer) {
     return token;
 }
 
+void read_vector(Lexer *lexer, Token *token)
+{
+    // Pular espaços em branco após "vector"
+    while (lexer->position < lexer->length && isspace(lexer->source[lexer->position]))
+    {
+        lexer->position++;
+    }
+
+    // Ler o nome do vetor (identificador)
+    if (isalpha(lexer->source[lexer->position]) || lexer->source[lexer->position] == '_')
+    {
+        const char *start_name = &lexer->source[lexer->position];
+        size_t name_length = 0;
+
+        // Ler o identificador do nome do vetor
+        while (lexer->position < lexer->length &&
+               (isalnum(lexer->source[lexer->position]) || lexer->source[lexer->position] == '_'))
+        {
+            lexer->position++;
+            name_length++;
+        }
+
+        // Armazenar o nome do vetor no token
+        token->str_value = strndup(start_name, name_length);
+    }
+
+
+    int posicao_pre_tamanho = lexer->position;
+
+    // Verificar se há um '['
+    if (lexer->position < lexer->length && lexer->source[lexer->position] == '[')
+    {
+        lexer->position++; // Pular '['
+
+        // Ler o tamanho do vetor (um número inteiro)
+        const char *start_size = &lexer->source[lexer->position];
+        while (lexer->position < lexer->length && isdigit(lexer->source[lexer->position]))
+        {
+            lexer->position++;
+        }
+
+        size_t size_length = lexer->position - (start_size - lexer->source);
+        if (size_length > 0)
+        {
+            char *size_str = strndup(start_size, size_length);
+            token->vector_size = strtol(size_str, NULL, 10); // Armazenar tamanho do vetor no token
+            free(size_str);
+        }
+    }
+
+    // Verificar se há um ']'
+    if (lexer->position < lexer->length && lexer->source[lexer->position] == ']')
+    {
+        lexer->position++; // Pular ']'
+    }
+
+    lexer->position = posicao_pre_tamanho; // retornar a posição para o início do tamanho do vetor para ler tokens
+
+}
+
+
 // Lê um identificador ou palavra-chave da entrada e cria um token correspondente
-Token read_identifier_or_keyword(Lexer *lexer) {
+Token read_identifier_or_keyword(Lexer *lexer)
+{
+
     const char *start = &lexer->source[lexer->position];
     size_t length = 0;
-    while (lexer->position < lexer->length && (isalnum(lexer->source[lexer->position]) || lexer->source[lexer->position] == '_')) {
+    while (lexer->position < lexer->length && (isalnum(lexer->source[lexer->position]) || lexer->source[lexer->position] == '_'))
+    {
         lexer->position++;
         length++;
     }
@@ -71,36 +148,71 @@ Token read_identifier_or_keyword(Lexer *lexer) {
     token.str_value = strndup(start, length);
 
     // Verifica se o identificador é uma palavra-chave
-    if (strcmp(token.str_value, "int") == 0) {
+    if (strcmp(token.str_value, "int") == 0)
+    {
         token.type = TOKEN_INT;
-    } else if (strcmp(token.str_value, "float") == 0) {
+    }
+    else if (strcmp(token.str_value, "float") == 0)
+    {
         token.type = TOKEN_FLOAT;
-    } else if (strcmp(token.str_value, "char") == 0) {
+    }
+    else if (strcmp(token.str_value, "char") == 0)
+    {
         token.type = TOKEN_CHAR;
-    } else if (strcmp(token.str_value, "if") == 0) {
+    }
+    else if (strcmp(token.str_value, "if") == 0)
+    {
         token.type = TOKEN_IF;
-    } else if (strcmp(token.str_value, "else") == 0) {
+    }
+    else if (strcmp(token.str_value, "else") == 0)
+    {
         token.type = TOKEN_ELSE;
-    } else if (strcmp(token.str_value, "while") == 0) {
+    }
+    else if (strcmp(token.str_value, "while") == 0)
+    {
         token.type = TOKEN_WHILE;
-    } else if (strcmp(token.str_value, "for") == 0) {
+    }
+    else if (strcmp(token.str_value, "for") == 0)
+    {
         token.type = TOKEN_FOR;
-    } else if (strcmp(token.str_value, "return") == 0) {
+    }
+    else if (strcmp(token.str_value, "return") == 0)
+    {
         token.type = TOKEN_RETURN;
-    } else if (strcmp(token.str_value, "break") == 0) {
+    }
+    else if (strcmp(token.str_value, "break") == 0)
+    {
         token.type = TOKEN_BREAK;
-    } else if (strcmp(token.str_value, "function") == 0) {
+    }
+    else if (strcmp(token.str_value, "function") == 0)
+    {
         token.type = TOKEN_FUNCTION;
+    }
+    else if (strcmp(token.str_value, "print") == 0)
+    {
+        token.type = TOKEN_PRINT;
+    }
+    else if (strcmp(token.str_value, "scan") == 0)
+    {
+        token.type = TOKEN_SCAN;
+    }
+    else if (strcmp(token.str_value, "vector") == 0)
+    {
+        token.type = TOKEN_VECTOR;
+        read_vector(lexer, &token);
+
     }
 
     return token;
 }
 
 // Lê uma string literal da entrada e cria um token de string
-Token read_string_literal(Lexer *lexer) {
+Token read_string_literal(Lexer *lexer)
+{
     lexer->position++; // Pula a aspa inicial
     const char *start = &lexer->source[lexer->position];
-    while (lexer->position < lexer->length && lexer->source[lexer->position] != '"') {
+    while (lexer->position < lexer->length && lexer->source[lexer->position] != '"')
+    {
         lexer->position++;
     }
     size_t length = lexer->position - (start - lexer->source);
@@ -112,7 +224,8 @@ Token read_string_literal(Lexer *lexer) {
 }
 
 // Lê um caractere literal da entrada e cria um token de caractere
-Token read_char_literal(Lexer *lexer) {
+Token read_char_literal(Lexer *lexer)
+{
     lexer->position++; // Pula a aspa simples inicial
     char char_value = lexer->source[lexer->position];
     lexer->position++; // Pula o caractere
@@ -124,82 +237,96 @@ Token read_char_literal(Lexer *lexer) {
 }
 
 // Lê operadores e delimitadores da entrada e cria um token correspondente
-Token read_operators_delimiters(Lexer *lexer) {
+Token read_operators_delimiters(Lexer *lexer)
+{
     Token token;
     char current_char = lexer->source[lexer->position];
 
-    switch (current_char) {
-        case '+':
-            token = make_token(lexer, TOKEN_PLUS);
-            break;
-        case '-':
-            token = make_token(lexer, TOKEN_MINUS);
-            break;
-        case '*':
-            token = make_token(lexer, TOKEN_MULT);
-            break;
-        case '/':
-            token = make_token(lexer, TOKEN_DIV);
-            break;
-        case '!':
-            if (lexer->source[lexer->position + 1] == '=') {
-                token = make_token(lexer, TOKEN_NEQ);
-                lexer->position++;
-            } else {
-                token = make_token(lexer, TOKEN_NOT);
-            }
-            break;
-        case '=':
-            if (lexer->source[lexer->position + 1] == '=') {
-                token = make_token(lexer, TOKEN_EQ);
-                lexer->position++;
-            } else {
-                token = make_token(lexer, TOKEN_ASSIGN);
-            }
-            break;
-        case '<':
-            if (lexer->source[lexer->position + 1] == '=') {
-                token = make_token(lexer, TOKEN_LTE);
-                lexer->position++;
-            } else {
-                token = make_token(lexer, TOKEN_LT);
-            }
-            break;
-        case '>':
-            if (lexer->source[lexer->position + 1] == '=') {
-                token = make_token(lexer, TOKEN_GTE);
-                lexer->position++;
-            } else {
-                token = make_token(lexer, TOKEN_GT);
-            }
-            break;
-        case '(':
-            token = make_token(lexer, TOKEN_LPAREN);
-            break;
-        case ')':
-            token = make_token(lexer, TOKEN_RPAREN);
-            break;
-        case '{':
-            token = make_token(lexer, TOKEN_LBRACE);
-            break;
-        case '}':
-            token = make_token(lexer, TOKEN_RBRACE);
-            break;
-        case '[':
-            token = make_token(lexer, TOKEN_LBRACKET);
-            break;
-        case ']':
-            token = make_token(lexer, TOKEN_RBRACKET);
-            break;
-        case ';':
-            token = make_token(lexer, TOKEN_SEMICOLON);
-            break;
-        case ',':
-            token = make_token(lexer, TOKEN_COMMA);
-            break;
-        default:
-            token = make_token(lexer, TOKEN_EOF);
-            break;
+    switch (current_char)
+    {
+    case '+':
+        token = make_token(lexer, TOKEN_PLUS);
+        break;
+    case '-':
+        token = make_token(lexer, TOKEN_MINUS);
+        break;
+    case '*':
+        token = make_token(lexer, TOKEN_MULT);
+        break;
+    case '/':
+        token = make_token(lexer, TOKEN_DIV);
+        break;
+    case '!':
+        if (lexer->source[lexer->position + 1] == '=')
+        {
+            token = make_token(lexer, TOKEN_NEQ);
+            lexer->position++;
+        }
+        else
+        {
+            token = make_token(lexer, TOKEN_NOT);
+        }
+        break;
+    case '=':
+        if (lexer->source[lexer->position + 1] == '=')
+        {
+            token = make_token(lexer, TOKEN_EQ);
+            lexer->position++;
+        }
+        else
+        {
+            token = make_token(lexer, TOKEN_ASSIGN);
+        }
+        break;
+    case '<':
+        if (lexer->source[lexer->position + 1] == '=')
+        {
+            token = make_token(lexer, TOKEN_LTE);
+            lexer->position++;
+        }
+        else
+        {
+            token = make_token(lexer, TOKEN_LT);
+        }
+        break;
+    case '>':
+        if (lexer->source[lexer->position + 1] == '=')
+        {
+            token = make_token(lexer, TOKEN_GTE);
+            lexer->position++;
+        }
+        else
+        {
+            token = make_token(lexer, TOKEN_GT);
+        }
+        break;
+    case '(':
+        token = make_token(lexer, TOKEN_LPAREN);
+        break;
+    case ')':
+        token = make_token(lexer, TOKEN_RPAREN);
+        break;
+    case '{':
+        token = make_token(lexer, TOKEN_LBRACE);
+        break;
+    case '}':
+        token = make_token(lexer, TOKEN_RBRACE);
+        break;
+    case '[':
+        token = make_token(lexer, TOKEN_LBRACKET);
+        break;
+    case ']':
+        token = make_token(lexer, TOKEN_RBRACKET);
+        break;
+    case ';':
+        token = make_token(lexer, TOKEN_SEMICOLON);
+        break;
+    case ',':
+        token = make_token(lexer, TOKEN_COMMA);
+        break;
+    default:
+        token = make_token(lexer, TOKEN_EOF);
+        break;
     }
 
     lexer->position++;
@@ -207,47 +334,64 @@ Token read_operators_delimiters(Lexer *lexer) {
 }
 
 // Ignora comentários na entrada
-void skip_comment(Lexer *lexer) {
-    while (lexer->position < lexer->length && lexer->source[lexer->position] != '\n') {
+void skip_comment(Lexer *lexer)
+{
+    while (lexer->position < lexer->length && lexer->source[lexer->position] != '\n')
+    {
         lexer->position++;
     }
     // Pula o caractere de nova linha também
-    if (lexer->position < lexer->length && lexer->source[lexer->position] == '\n') {
+    if (lexer->position < lexer->length && lexer->source[lexer->position] == '\n')
+    {
         lexer->position++;
     }
     lexer->line++;
 }
 
 // Tokeniza a entrada e armazena os tokens no array de tokens
-void tokenize(Lexer *lexer, TokenArray *token_array) {
+void tokenize(Lexer *lexer, TokenArray *token_array)
+{
     init_token_array(token_array);
 
-    while (lexer->position < lexer->length) {
+    while (lexer->position < lexer->length)
+    {
         char current_char = lexer->source[lexer->position];
 
-        if (isspace(current_char)) {
-            if (current_char == '\n') {
+        if (isspace(current_char))
+        {
+            if (current_char == '\n')
+            {
                 lexer->line++;
             }
             lexer->position++;
             continue;
         }
 
-        if (current_char == '#') {
+        if (current_char == '#')
+        {
             skip_comment(lexer);
             continue;
         }
 
         Token token;
-        if (isdigit(current_char)) {
+        if (isdigit(current_char))
+        {
             token = read_number(lexer);
-        } else if (isalpha(current_char) || current_char == '_') {
+        }
+        else if (isalpha(current_char) || current_char == '_')
+        {
             token = read_identifier_or_keyword(lexer);
-        } else if (current_char == '"') {
+        }
+        else if (current_char == '"')
+        {
             token = read_string_literal(lexer);
-        } else if (current_char == '\'') {
+        }
+        else if (current_char == '\'')
+        {
             token = read_char_literal(lexer);
-        } else {
+        }
+        else
+        {
             token = read_operators_delimiters(lexer);
         }
 
