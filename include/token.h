@@ -9,17 +9,18 @@ typedef enum
     TOKEN_EOF,
 
     // Literais
-    TOKEN_NUMBER_INT,            // Token numérico
-    TOKEN_NUMBER_FLOAT,          // Token numérico
+    TOKEN_NUMBER_INT,        // Token numérico
+    TOKEN_NUMBER_FLOAT,      // Token numérico
     TOKEN_IDENTIFIER,        // Token identificador
-    TOKEN_STRING,            // Token string
     TOKEN_CHAR_LITERAL,      // Literal de caractere
     TOKEN_STRING_LITERAL,    // Literal de string
 
     // Palavras-chave (Keyword)
     TOKEN_INT,               // Palavra-chave inteiro
     TOKEN_FLOAT,             // Palavra-chave float
+    TOKEN_VECTOR,            // Palavra-chave vector
     TOKEN_CHAR,              // Palavra-chave char
+    TOKEN_STRING,            // Token string
     TOKEN_IF,                // Palavra-chave if
     TOKEN_ELSE,              // Palavra-chave else
     TOKEN_WHILE,             // Palavra-chave while
@@ -29,7 +30,6 @@ typedef enum
     TOKEN_FUNCTION,          // Palavra-chave function
     TOKEN_PRINT,             // Palavra-chave print
     TOKEN_SCAN,              // Palavra-chave read
-    TOKEN_VECTOR,
 
     // Operadores
     TOKEN_PLUS,              // Operador de adição + 
@@ -53,7 +53,7 @@ typedef enum
     TOKEN_LBRACKET,          // Colchete esquerdo [
     TOKEN_RBRACKET,          // Colchete direito ]
     TOKEN_SEMICOLON,         // Ponto e vírgula ; DELIMITADOR
-    TOKEN_COMMA,            // Vírgula ,
+    TOKEN_COMMA,             // Vírgula ,
 } TokenType;
 
 typedef struct {
@@ -61,8 +61,7 @@ typedef struct {
     size_t linha;
     long long int int_value;
     long double float_value;
-    char *str_value;  // Identificadores ou strings literais ou nome_vetor
-    long int vector_size; // Tamanho do vetor
+    char *str_value;      // Identificadores ou strings literais
 } Token;
 
 typedef struct {
@@ -74,6 +73,7 @@ typedef struct {
 void init_token_array(TokenArray *arr);
 void add_token(TokenArray *arr, Token token);
 void free_token_array(TokenArray *arr);
+void print_token(Token token);
 void print_token_array(const TokenArray *arr);
 
 #endif // TOKEN_H

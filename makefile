@@ -4,7 +4,7 @@ CFLAGS = -Wall -O2 -Iinclude
 # Diretórios
 SRC_DIR = src
 INCLUDE_DIR = include
-TEST_DIR = tests/lexer_tests
+TEST_DIRS = tests/lexer_tests tests/parser_tests
 
 # Arquivos fonte e objetos
 SRCS = $(wildcard $(SRC_DIR)/*.c)
@@ -14,7 +14,7 @@ OBJS = $(SRCS:.c=.o)
 TARGET = main
 
 # Arquivos de teste
-TESTS = $(wildcard $(TEST_DIR)/*.txt)
+TESTS = $(wildcard $(foreach dir, $(TEST_DIRS), $(dir)/*.txt))
 
 # Alvo principal
 all: $(TARGET)
@@ -31,9 +31,14 @@ src/main.o: src/main.c
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_DIR)/%.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Regras para executar os testes do lexer, passando arquivos de teste como argumentos para o executável
-$(TESTS): $(TARGET)
-	./$(TARGET) $@
+# Regra para executar um teste específico
+run-test: $(TARGET)
+	@if [ -z "$(TEST)" ]; then \
+		echo "Usage: make run-test TEST=<path/to/test_file.txt>"; \
+	else \
+		echo "Running test: $(TEST)"; \
+		./$(TARGET) $(TEST); \
+	fi
 
 # Limpa arquivos objeto e o executável gerados, preparando o ambiente para uma nova compilação
 clean:

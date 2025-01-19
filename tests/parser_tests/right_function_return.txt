@@ -1,0 +1,4 @@
+function teste(int a, char b)
+{
+    return oi;
+}

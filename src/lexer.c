@@ -25,7 +25,6 @@ Token make_token(Lexer *lexer, TokenType type)
     token.int_value = 0;
     token.float_value = 0.0;
     token.str_value = NULL;
-    token.vector_size = 0;
     return token;
 }
 
@@ -72,67 +71,6 @@ Token read_number(Lexer *lexer)
     return token;
 }
 
-void read_vector(Lexer *lexer, Token *token)
-{
-    // Pular espaços em branco após "vector"
-    while (lexer->position < lexer->length && isspace(lexer->source[lexer->position]))
-    {
-        lexer->position++;
-    }
-
-    // Ler o nome do vetor (identificador)
-    if (isalpha(lexer->source[lexer->position]) || lexer->source[lexer->position] == '_')
-    {
-        const char *start_name = &lexer->source[lexer->position];
-        size_t name_length = 0;
-
-        // Ler o identificador do nome do vetor
-        while (lexer->position < lexer->length &&
-               (isalnum(lexer->source[lexer->position]) || lexer->source[lexer->position] == '_'))
-        {
-            lexer->position++;
-            name_length++;
-        }
-
-        // Armazenar o nome do vetor no token
-        token->str_value = strndup(start_name, name_length);
-    }
-
-
-    int posicao_pre_tamanho = lexer->position;
-
-    // Verificar se há um '['
-    if (lexer->position < lexer->length && lexer->source[lexer->position] == '[')
-    {
-        lexer->position++; // Pular '['
-
-        // Ler o tamanho do vetor (um número inteiro)
-        const char *start_size = &lexer->source[lexer->position];
-        while (lexer->position < lexer->length && isdigit(lexer->source[lexer->position]))
-        {
-            lexer->position++;
-        }
-
-        size_t size_length = lexer->position - (start_size - lexer->source);
-        if (size_length > 0)
-        {
-            char *size_str = strndup(start_size, size_length);
-            token->vector_size = strtol(size_str, NULL, 10); // Armazenar tamanho do vetor no token
-            free(size_str);
-        }
-    }
-
-    // Verificar se há um ']'
-    if (lexer->position < lexer->length && lexer->source[lexer->position] == ']')
-    {
-        lexer->position++; // Pular ']'
-    }
-
-    lexer->position = posicao_pre_tamanho; // retornar a posição para o início do tamanho do vetor para ler tokens
-
-}
-
-
 // Lê um identificador ou palavra-chave da entrada e cria um token correspondente
 Token read_identifier_or_keyword(Lexer *lexer)
 {
@@ -159,6 +97,10 @@ Token read_identifier_or_keyword(Lexer *lexer)
     else if (strcmp(token.str_value, "char") == 0)
     {
         token.type = TOKEN_CHAR;
+    }
+    else if (strcmp(token.str_value, "string") == 0)
+    {
+        token.type = TOKEN_STRING;
     }
     else if (strcmp(token.str_value, "if") == 0)
     {
@@ -199,8 +141,6 @@ Token read_identifier_or_keyword(Lexer *lexer)
     else if (strcmp(token.str_value, "vector") == 0)
     {
         token.type = TOKEN_VECTOR;
-        read_vector(lexer, &token);
-
     }
 
     return token;

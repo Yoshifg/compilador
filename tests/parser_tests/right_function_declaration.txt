@@ -1,0 +1,5 @@
+function teste (int a, char b)
+{
+    int x;
+    int y;
+}
