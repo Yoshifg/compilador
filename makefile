@@ -4,7 +4,7 @@ CFLAGS = -Wall -O2 -Iinclude
 # Diretórios
 SRC_DIR = src
 INCLUDE_DIR = include
-TEST_DIRS = tests/lexer_tests tests/parser_tests
+TEST_DIRS = tests/lexer_tests tests/parser_tests tests/semantic_analysis
 
 # Arquivos fonte e objetos
 SRCS = $(wildcard $(SRC_DIR)/*.c)

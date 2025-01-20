@@ -130,6 +130,7 @@ int parse_vector_declaration(SyntacticNode *node, Token *tokens, int *index)
 
 int parse_function_arguments(SyntacticNode *node, Token *tokens, int *index)
 {
+    int start_pos = *index;
     if (tokens[*index].type == TOKEN_INT ||
         tokens[*index].type == TOKEN_FLOAT ||
         tokens[*index].type == TOKEN_CHAR ||
@@ -156,6 +157,7 @@ int parse_function_arguments(SyntacticNode *node, Token *tokens, int *index)
         fprintf(stderr, "Erro de sintaxe: esperado algum tipo\n");
     }
     node->type = NULL_NODE;
+    *index = start_pos;
     return -1;
 }
 
@@ -233,8 +235,8 @@ int parse_function_declaration(SyntacticNode *node, Token *tokens, int *index)
                         function_body->left = statement;
                         while (tokens[*index].type != TOKEN_RBRACE)
                         {
-                            if (parse_return(statement, tokens, index) == -1 &&
-                                parse_assignment(statement, tokens, index) == -1)
+                            if (parse_statement(statement, tokens, index) == -1 &&
+                                parse_return(statement, tokens, index) == -1)
                             {
                                 free_syntactic_tree(statement);
                                 return -1;
@@ -311,6 +313,55 @@ int parse_assignment(SyntacticNode *node, Token *tokens, int *index)
                 }
             }
             free_syntactic_tree(expression);
+        }
+        else if (tokens[*index].type == TOKEN_LBRACKET)
+        {
+            printf("Entrou no if vector\n");
+            SyntacticNode *vector = create_node(NODE_VECTOR_DESCRIPTION, empty_token);
+            vector->left = node->left;
+            node->left = vector;
+            (*index)++;
+            if (tokens[*index].type == TOKEN_NUMBER_INT)
+            {
+                vector->right = create_node(NODE_VECTOR_POS, tokens[*index]);
+                (*index)++;
+                if (tokens[*index].type == TOKEN_RBRACKET)
+                {
+                    (*index)++;
+                    if (tokens[*index].type == TOKEN_ASSIGN)
+                    {
+                        (*index)++;
+                        SyntacticNode *expression = create_node(NODE_EXPRESSION, empty_token);
+                        if (parse_expression(expression, tokens, index) == 1)
+                        {
+                            node->right = expression;
+                            if (tokens[*index].type == TOKEN_SEMICOLON)
+                            {
+                                (*index)++;
+                                return 1;
+                            }
+                            else
+                            {
+                                fprintf(stderr, "Erro de sintaxe: esperado ';'\n");
+                            }
+                        }
+                        free_syntactic_tree(expression);
+                    }
+                    else
+                    {
+                        fprintf(stderr, "Erro de sintaxe: esperado '='\n");
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "Error: Expected ']' at line %zu\n", tokens[*index].linha);
+                }
+            }
+            else
+            {
+                fprintf(stderr, "Error: Expected number at line %zu\n", tokens[*index].linha);
+            }
+            free_syntactic_tree(vector);
         }
         else
         {
@@ -411,11 +462,13 @@ int parse_factor(SyntacticNode *node, Token *tokens, int *index)
             return -1;
         }
 
-        (*index)++; // Skip ')'
+        (*index)++;
         return 1;
     }
     else if (current_token.type == TOKEN_NUMBER_INT ||
              current_token.type == TOKEN_NUMBER_FLOAT ||
+             current_token.type == TOKEN_CHAR_LITERAL ||
+             current_token.type == TOKEN_STRING_LITERAL ||
              current_token.type == TOKEN_IDENTIFIER)
     {
         node->type = NODE_LITERAL;

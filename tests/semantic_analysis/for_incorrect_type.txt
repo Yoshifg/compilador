@@ -1,0 +1,5 @@
+char c;
+for (c; c < 2; c = c + 1;)
+{
+    int x;
+}

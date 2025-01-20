@@ -1,0 +1,6 @@
+int a;
+char b;
+if (a == b)
+{
+    int x;
+}

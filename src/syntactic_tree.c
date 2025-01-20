@@ -54,6 +54,8 @@ const char *node_type_to_string(NodeType type)
         return "NODE_VECTOR_NAME";
     case NODE_VECTOR_SIZE:
         return "NODE_VECTOR_SIZE";
+    case NODE_VECTOR_POS:
+        return "NODE_VECTOR_POS";
     case NODE_FUNCTION_DECLARATION:
         return "NODE_FUNCTION_DECLARATION";
     case NODE_FUNCTION_PARAMETERS:

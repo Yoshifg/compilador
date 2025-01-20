@@ -6,6 +6,7 @@
 #include "token.h"
 #include "syntactic_tree.h"
 #include "parser.h"
+#include "semantic_analysis.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +29,13 @@ int main(int argc, char *argv[])
     SyntacticNode *root = NULL;
     parse_tokens(&token_array, &root);
     print_tree(root);
+
+    SymbolTable table;
+    init_symbol_table(&table);
+    printf("Iniciando análise semântica...\n");
+    semantic_analysis(root, &table);
+    printf("Análise semântica concluída!\n");
+
 
     free(source);
     return EXIT_SUCCESS;
