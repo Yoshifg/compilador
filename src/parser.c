@@ -491,14 +491,16 @@ int parse_function_call_args(SyntacticNode *node, Token *tokens, int *index)
         tokens[*index].type == TOKEN_STRING_LITERAL ||
         tokens[*index].type == TOKEN_IDENTIFIER)
     {
+        printf("Entrou if args\n");
         if (tokens[*index].type == TOKEN_IDENTIFIER)
         {
-            node = create_node(NODE_IDENTIFIER, tokens[*index]);
+            node->type = NODE_IDENTIFIER;
         }
         else
         {
-            node = create_node(NODE_LITERAL, tokens[*index]);
+            node->type = NODE_LITERAL;
         }
+        node->token = tokens[*index];
         (*index)++;
         return 1;
     }
@@ -520,11 +522,11 @@ int parse_function_call(SyntacticNode *node, Token *tokens, int *index)
             {
                 SyntacticNode *function_arguments = create_node(NODE_FUNCTION_ARGUMENTS, empty_token);
                 node->right = function_arguments;
-                SyntacticNode *current_argument = create_node(NODE_FUNCTION_ARGUMENTS, empty_token);
+                SyntacticNode *current_argument = create_node(NULL_NODE, empty_token);
                 function_arguments->left = current_argument;
                 while (tokens[*index].type != TOKEN_RPAREN)
                 {
-                    if (parse_expression(current_argument, tokens, index) == -1)
+                    if (parse_function_call_args(current_argument, tokens, index) == -1)
                     {
                         free_syntactic_tree(current_argument);
                         break;

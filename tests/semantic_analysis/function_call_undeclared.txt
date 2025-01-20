@@ -1,0 +1,4 @@
+int a;
+int b;
+int c;
+parser(a, b, c);

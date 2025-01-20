@@ -1,0 +1,9 @@
+int a;
+int b;
+
+function parser(int x, int y, int z)
+{
+    string oi;
+}
+
+parser(a, b);

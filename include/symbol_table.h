@@ -21,6 +21,8 @@ typedef struct
     char *name;      // Nome do identificador
     SymbolType type; // Tipo do identificador
     size_t scope;    // Nível do escopo
+    size_t param_count; // Número de parâmetros da função
+    SymbolType *param_types; // Tipos dos parâmetros da função
 } Symbol;
 
 typedef struct
